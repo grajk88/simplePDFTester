@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="609.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
+   <children>
+      <MenuBar prefHeight="29.0" prefWidth="600.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <Label layoutX="22.0" layoutY="52.0" text="PDF(s) Location" />
+      <TextField fx:id="pdfLocation" layoutX="22.0" layoutY="80.0" prefHeight="27.0" prefWidth="555.0" text="/users/giridhar/documents/invoice_2"/>
+      <TextField fx:id="dataSheetLocation" layoutX="22.0" layoutY="208.0" prefHeight="27.0" prefWidth="555.0" />
+      <Label layoutX="22.0" layoutY="180.0" text="Data Sheet Location" />
+      <CheckBox fx:id="dataDrivenTesting" layoutX="22.0" layoutY="135.0" mnemonicParsing="false" text="Enable Multi-PDF Testing" />
+      <CheckBox fx:id="visualCheck" layoutX="22.0" layoutY="258.0" mnemonicParsing="false" text="Enable Visual Check" />
+      <Label layoutX="23.0" layoutY="295.0" text="API Key" />
+      <TextField fx:id="apikey" layoutX="23.0" layoutY="327.0" prefHeight="27.0" prefWidth="555.0" />
+      <Button layoutX="479.0" layoutY="387.0" mnemonicParsing="false" onAction="#uploadPDFDocument" text="Validate Now" />
+      <CheckBox fx:id="magicCheck" layoutX="381.0" layoutY="135.0" mnemonicParsing="false" text="Magic Check (co-ordinates)" />
+      <Text fx:id="message" fill="#08800e" layoutX="238.0" layoutY="466.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You can see status here" visible="false" />
+      <ImageView visible="false" fx:id="loadingGif" fitHeight="98.0" fitWidth="55.0" layoutX="284.0" layoutY="461.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@loading.gif" />
+         </image>
+      </ImageView>
+      <Text fx:id="message1" fill="#08800e" layoutX="202.0" layoutY="529.0" strokeType="OUTSIDE" strokeWidth="0.0" visible="false" text="Please wait while we execute your tests" />
+   </children>
+</AnchorPane>

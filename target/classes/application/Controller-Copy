@@ -1,0 +1,264 @@
+package application;
+
+import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Properties;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextField;
+import javafx.scene.text.Text;
+
+import com.relevantcodes.extentreports.ExtentReports;
+import com.relevantcodes.extentreports.ExtentTest;
+import com.relevantcodes.extentreports.LogStatus;
+
+public class Controller {
+
+	@FXML
+	private Button uploadPDFButton; // name should be same as the fx:id
+
+	@FXML
+	private TextField apikey; // name should be same as the fx:id
+
+	@FXML
+	private TextField pdfLocation;
+
+	@FXML
+	private TextField dataSheetLocation;
+
+	@FXML
+	private CheckBox dataDrivenTesting;
+
+	@FXML
+	private CheckBox visualCheck;
+
+	@FXML
+	private Text message;
+
+	private static ExtentReports extent;
+
+	@FXML
+	public void uploadPDFDocument(ActionEvent event) throws Exception {
+
+		try {
+
+			extent = new ExtentReports(System.getProperty("user.dir") + "//Test-Report.html", true);
+
+			ExtentTest test = extent.startTest("My First Test", "Sample description");
+
+			String apiKeyString = apikey.getText().toString();
+
+			String pdfLocationString = pdfLocation.getText().toString();
+
+			String dataSheetPath = dataSheetLocation.getText().toString();
+
+			System.out.println(apiKeyString + pdfLocationString + dataSheetPath);
+			
+			String filepath = System.getProperty("user.dir") + "/pdfs/Invoice_1.pdf";
+
+			File f = new File(filepath);
+
+			String fileName = f.getName().replaceAll(".pdf", "");
+
+			// Functional Check Begins
+			
+			
+			
+			
+			
+			
+			
+			
+			// Magic Check Begins
+
+			filepath = System.getProperty("user.dir") + "/pdfs/Invoice_1.pdf";
+
+			 f = new File(filepath);
+
+			 fileName = f.getName().replaceAll(".pdf", "");
+
+			int page = 0;
+
+			int x = 40;
+			int y = 35;
+			int width = 100;
+			int height = 30;
+
+			PDDocument document = PDDocument.load(new File(filepath));
+
+			PDFTextStripperByArea textStripper = new PDFTextStripperByArea();
+
+			Rectangle2D rect = new java.awt.geom.Rectangle2D.Float(x, y, width, height);
+
+			textStripper.addRegion("region", rect);
+
+			PDPage docPage = document.getPage(page);
+
+			textStripper.extractRegions(docPage);
+
+			String textForRegion = textStripper.getTextForRegion("region");
+
+			System.out.println(textForRegion);
+
+			test.log(LogStatus.INFO, "Able to identify the texts)");
+			
+
+			if (dataDrivenTesting.isSelected()) {
+
+				try {
+
+					String dataSheetName = System.getProperty("user.dir") + "/DataSheet.xlsx";
+
+					XSSFWorkbook workbook = new XSSFWorkbook(dataSheetName);
+
+					XSSFSheet sheet = workbook.getSheet("Sheet1"); // Get data as per sheet name
+
+					for (Row row : sheet) { // For each Row.
+
+						Cell cell = row.getCell(0); // Get the Cell at the Index / Column you want.
+
+						if (cell.getStringCellValue().equalsIgnoreCase(fileName)) {
+
+							for (int i = 0; i <= cell.getRow().getLastCellNum() - 1; i++) {
+
+								String columnName = cell.getSheet().getRow(0).getCell(i).getRichStringCellValue()
+										.toString();
+
+								System.out.println(
+										cell.getSheet().getRow(0).getCell(i).getRichStringCellValue().toString());
+
+								System.out.println(cell.getRow().getCell(i));
+
+								System.out.println("************");
+
+								try (InputStream input = new FileInputStream(
+										System.getProperty("user.dir") + "/Locators.properties")) {
+
+									Properties prop = new Properties();
+
+									prop.load(input);
+
+									// prop.forEach((key, value) -> System.out.println(key + " : " + value));
+
+									String coordinates = prop.getProperty(columnName);
+
+									String[] values = coordinates.split(",");
+
+									System.out.println(Arrays.toString(values));
+
+									x = Integer.parseInt(values[0]);
+
+									y = Integer.parseInt(values[0]);
+
+									height = Integer.parseInt(values[0]);
+
+									width = Integer.parseInt(values[0]);
+
+									document = PDDocument.load(new File(filepath));
+
+									textStripper = new PDFTextStripperByArea();
+
+									rect = new java.awt.geom.Rectangle2D.Float(x, y, width, height);
+
+									textStripper.addRegion("region", rect);
+
+									docPage = document.getPage(page);
+
+									textStripper.extractRegions(docPage);
+
+									textForRegion = textStripper.getTextForRegion("region");
+
+									System.out.println(textForRegion);
+
+								} catch (IOException ex) {
+									ex.printStackTrace();
+								}
+
+							}
+						}
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
+			// Multiple PDF Tests Ends
+
+			// Visual Check Begins
+
+			if (visualCheck.isSelected()) {
+
+				try {
+
+					String command = String.format("java -jar /Users/giridhar/Downloads/ImageTester.jar -k "
+							+ apiKeyString + " -f " + pdfLocationString);
+
+					Process process = Runtime.getRuntime().exec(command);
+
+					process.waitFor();
+
+					String stream = IOUtils.toString(process.getInputStream(), "UTF-8");
+
+					if (stream != null && stream.contains("Mismatch")) {
+
+						message.setVisible(true);
+
+						message.setText("Mismatches Found. Navigate to Applitools to view the results...");
+
+					} else if (stream != null && stream.contains("Nothing to test!")) {
+
+						message.setVisible(true);
+
+						message.setText("There is some issue in Uploading the PDF. Can you check the path of the PDF?");
+
+					} else if (stream != null && stream.contains("[New]") || stream.contains("[Passed]")) {
+
+						message.setVisible(true);
+
+						message.setText("Upload Completed...");
+
+					}
+
+				} catch (Exception e) {
+
+					message.setVisible(true);
+
+					message.setText(
+							"There is some Problem in uploading the PDF. Try again and if issue persists, contact QE Enablers");
+
+				}
+
+			}
+
+			// Visual Check Ends
+
+			extent.endTest(test);
+
+			extent.flush();
+		}
+
+		catch (Exception e) {
+			System.out.println(e);
+		}
+
+	}
+
+}
